@@ -17,7 +17,7 @@ export default function RegisterScreen() {
         return;
       }
       await createUserWithEmailAndPassword(auth, email, password);
-      router.push("/about");
+      router.push("/");
     } catch (error: any) {
       alert("Registration failed: " + error.message);
     } finally {

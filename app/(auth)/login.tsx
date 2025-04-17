@@ -13,7 +13,7 @@ export default function LoginScreen() {
     setLoading(true);
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      router.push("/about");
+      router.push("/");
     } catch (error: any) {
       alert("Login failed: " + error.message);
     } finally {

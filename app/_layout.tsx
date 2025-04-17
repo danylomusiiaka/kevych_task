@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { auth } from "../lib/firebase";
 import { ActivityIndicator, View } from "react-native";
+import { store } from "../store/index";
+import { Provider } from "react-redux";
 
 export default function RootLayout() {
   const [initiating, setInitiating] = useState(true);
@@ -26,10 +28,12 @@ export default function RootLayout() {
   }
 
   return (
-    <Stack
-      screenOptions={{
-        headerShown: false,
-      }}
-    />
+    <Provider store={store}>
+      <Stack
+        screenOptions={{
+          headerShown: false,
+        }}
+      />
+    </Provider>
   );
 }

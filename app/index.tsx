@@ -1,62 +1,59 @@
 import { useCallback, useEffect, useState } from "react";
-import { Linking, SafeAreaView, Text, TouchableOpacity, View, ScrollView, RefreshControl, TextInput, StatusBar } from "react-native";
-import * as Location from "expo-location";
+import { SafeAreaView, Text, TouchableOpacity, View, ScrollView, RefreshControl, StatusBar, Image } from "react-native";
 import { useRouter } from "expo-router";
-import { findGreetingByCountryCode } from "native-greetings";
 import SearchWeatherField from "./ui/SearchWeatherField";
 import Divider from "./ui/Divider";
 import NoLocationEnabled from "./ui/NoLocationEnabled";
-import Chevron from "react-native-vector-icons/Ionicons";
 import FlipCard from "./ui/Flipcard";
+import { getWeather } from "@/utils/getWeather";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/store";
+import { setWeather } from "@/store/weatherSlice";
+import { getAutomaticlyCity } from "@/utils/getAutomaticlyCity";
+import { BlurView } from "expo-blur";
+import PropositionToRegister from "./ui/PropositionToRegister";
 
 export default function MainScreen() {
   const router = useRouter();
   const [city, setCity] = useState("");
   const [greeting, setGreeting] = useState("Hello");
   const [loadingLocation, setLoadingLocation] = useState(true);
+  const dispatch = useDispatch<AppDispatch>();
+  const weather = useSelector((state: RootState) => state.weather.data);
 
-  const getAutomaticlyCity = async () => {
+  const getLocaleWeather = async () => {
     setLoadingLocation(true);
     try {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-
-      if (status !== "granted") {
-        setLoadingLocation(false);
-        setCity("");
-        return;
+      const locationData = await getAutomaticlyCity();
+      if (locationData) {
+        const { city, greeting } = locationData;
+        setCity(city);
+        setGreeting(greeting);
+        const data = await getWeather(city);
+        dispatch(setWeather(data));
       }
-
-      const location = await Location.getCurrentPositionAsync({});
-      const [reverseGeocode] = await Location.reverseGeocodeAsync({
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
-      });
-
-      const greetingByCountry = findGreetingByCountryCode(reverseGeocode.isoCountryCode);
-      if (greetingByCountry !== "Greeting not found for this country code") {
-        setGreeting(greetingByCountry);
-      }
-
-      setCity(reverseGeocode.city || "");
-    } catch (error) {
-      console.error("Location error:", error);
-      setCity("");
+    } catch (error: any) {
+      alert(error.message);
     } finally {
       setLoadingLocation(false);
     }
   };
 
-  const onRefresh = useCallback(() => {
-    setLoadingLocation(true);
-    getAutomaticlyCity();
-  }, [city]);
-
   useEffect(() => {
-    getAutomaticlyCity();
+    getLocaleWeather();
   }, []);
 
+  const onRefresh = useCallback(() => {
+    getLocaleWeather();
+  }, [city]);
+
+  // const fetchAndStoreWeather = async (city: string) => {
+  //   const data = await getWeather(city);
+  //   dispatch(setWeather(data));
+  // };
+
   return (
-    <SafeAreaView className="flex-1">
+    <SafeAreaView className="flex-1" style={{ backgroundColor: weather?.background }}>
       <ScrollView
         contentContainerStyle={{ flexGrow: 1 }}
         refreshControl={<RefreshControl refreshing={loadingLocation} onRefresh={onRefresh} />}
@@ -68,26 +65,35 @@ export default function MainScreen() {
           <>
             {city && (
               <>
-                <Text className="mb-5 text-3xl font-thin text-gray-800">
+                <Text className="mb-5 text-3xl font-medium text-white">
                   {greeting}, {city}!
                 </Text>
-                <TouchableOpacity className="flex items-center bg-blue-500 p-3" onPress={() => router.push("/about")}>
-                  <Text className="text-base font-medium text-white">Get weather in {city}</Text>
-                </TouchableOpacity>
+                <BlurView intensity={100} tint="light" style={{ borderRadius: 16, overflow: "hidden", marginBottom: 10 }}>
+                  <View className="mr-5 flex-row items-center justify-between">
+                    <View className="flex-row items-center">
+                      <Image source={{ uri: weather?.icon }} style={{ width: 80, height: 80 }} />
+                      <View>
+                        <Text className="text-xl font-medium text-white">{weather?.main}</Text>
+                        <Text className="text-white">{weather?.description}</Text>
+                      </View>
+                    </View>
+                    <Text className="text-2xl text-white">{weather?.temp.toFixed(0)}°</Text>
+                  </View>
+                </BlurView>
+                <BlurView intensity={100} tint="light" style={{ borderRadius: 16, overflow: "hidden" }}>
+                  <TouchableOpacity className="flex items-center p-3" onPress={() => router.push("/detailed_result")}>
+                    <Text className="text-base font-medium text-white">Click to get detailed weather in {city}</Text>
+                  </TouchableOpacity>
+                </BlurView>
                 <Divider>or</Divider>
+
                 <SearchWeatherField />
               </>
             )}
           </>
         )}
 
-        <View className="mt-4 rounded-md border-2 border-slate-300 bg-slate-200 p-3">
-          <Text className="text-2xl font-light text-gray-700">Want to save more search queries?</Text>
-          <TouchableOpacity className="w-1/2 flex-row items-center space-x-2 self-end rounded-md bg-blue-500 p-3" onPress={() => router.push("/(auth)/registration")}>
-            <Text className="font-medium text-white">Go to registration</Text>
-            <Chevron name="chevron-forward" size={18} color="white"></Chevron>
-          </TouchableOpacity>
-        </View>
+        <PropositionToRegister />
         <StatusBar />
       </ScrollView>
     </SafeAreaView>
