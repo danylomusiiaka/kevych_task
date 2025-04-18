@@ -27,5 +27,6 @@ export const getToday3HourForecast = async (city: string) => {
     todayForecast.push(midnightTomorrow);
   }
 
+
   return todayForecast;
 };

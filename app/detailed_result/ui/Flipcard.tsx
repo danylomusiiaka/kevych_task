@@ -1,6 +1,6 @@
 import { BlurView } from "expo-blur";
 import React, { useState } from "react";
-import { TouchableOpacity, View, StyleSheet } from "react-native";
+import { TouchableOpacity, StyleSheet } from "react-native";
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, interpolate } from "react-native-reanimated";
 
 type FlipCardProps = {

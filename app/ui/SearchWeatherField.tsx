@@ -1,5 +1,5 @@
 import { View, Text, TextInput, TouchableOpacity, ActivityIndicator } from "react-native";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "expo-router";
 import Search from "react-native-vector-icons/AntDesign";
 import { BlurView } from "expo-blur";
@@ -9,6 +9,8 @@ import { setWeather } from "@/store/weatherSlice";
 import { getWeather } from "@/utils/getWeather";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getEnglishNameForCity } from "@/utils/getEnglishNameForCity";
+import { auth } from "@/lib/firebase";
+import { saveCityInDb } from "@/lib/saveUserCity";
 
 export default function SearchWeatherField() {
   const [city, setCity] = useState("");
@@ -18,7 +20,7 @@ export default function SearchWeatherField() {
   const [recentCities, setRecentCities] = useState<string[]>([]);
 
   const onSubmit = async (city: string) => {
-    if (city == "" || !isNaN(Number(city))) {
+    if (city === "" || !isNaN(Number(city))) {
       alert("Please provide valid city name");
       return;
     }
@@ -64,6 +66,13 @@ export default function SearchWeatherField() {
     }
   };
 
+  const saveCityInFirestore = async (city: string) => {
+    const user = auth.currentUser;
+    if (user) {
+      await saveCityInDb(user.uid, city);
+    }
+  };
+
   return (
     <BlurView intensity={100} tint="light" style={{ borderRadius: 16, overflow: "hidden", marginBottom: 20 }}>
       <View className="space-y-3 p-3">
@@ -83,7 +92,7 @@ export default function SearchWeatherField() {
         {recentCities.length > 0 && (
           <View className="flex-row flex-wrap space-x-2">
             {recentCities.map((cityName, index) => (
-              <TouchableOpacity key={index} onPress={() => onSubmit(cityName)}>
+              <TouchableOpacity key={index} onPress={() => onSubmit(cityName)} onLongPress={() => saveCityInFirestore(cityName)}>
                 <BlurView intensity={100} tint="light" style={{ borderRadius: 16, overflow: "hidden" }}>
                   <Text className="px-4 py-2 text-white">{cityName}</Text>
                 </BlurView>
@@ -91,6 +100,7 @@ export default function SearchWeatherField() {
             ))}
           </View>
         )}
+        {auth.currentUser && <Text className="text-white">* long press on city to add to saved forecasts</Text>}
       </View>
     </BlurView>
   );

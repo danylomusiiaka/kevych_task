@@ -4,7 +4,7 @@ import { BlurView } from "expo-blur";
 import Chevron from "react-native-vector-icons/Feather";
 import { useRouter } from "expo-router";
 
-export default function PropositionToRegister() {
+export default function PropositionToAuth() {
   const router = useRouter();
 
   return (
@@ -13,7 +13,7 @@ export default function PropositionToRegister() {
         <Text className="text-xl font-medium text-white">Want to save more search queries?</Text>
         <BlurView intensity={100} tint="light" style={{ borderRadius: 16, overflow: "hidden" }}>
           <TouchableOpacity className="flex-row items-center justify-center rounded-md p-3" onPress={() => router.push("/(auth)/registration")}>
-            <Text className="font-medium text-white">Go to registration</Text>
+            <Text className="font-medium text-white">Go to authentication</Text>
             <Chevron name="chevron-right" size={18} color="white"></Chevron>
           </TouchableOpacity>
         </BlurView>

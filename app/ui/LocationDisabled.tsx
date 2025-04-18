@@ -1,7 +1,7 @@
 import { View, Text, Linking, TouchableOpacity } from "react-native";
 import React from "react";
 
-export default function NoLocationEnabled() {
+export default function LocationDisabled() {
   return (
     <View className="mb-4 space-y-3">
       <Text className="text-3xl font-extralight text-white">Welcome to Weather App!</Text>

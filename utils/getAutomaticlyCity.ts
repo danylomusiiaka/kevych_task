@@ -6,6 +6,12 @@ interface AutoCityResponse {
   city: string;
   greeting: string;
 }
+// try pass Berlin coordinates to simulate that you are from Germany
+// const lat = 52.52001;
+// const lon = 13.40495;
+// or pass Koto coordinates to simulate that you are from Japan
+// const lat = 35.652832;
+// const lon = 139.839478;
 
 export const getAutomaticlyCity = async (): Promise<AutoCityResponse | null> => {
   let greeting = "";

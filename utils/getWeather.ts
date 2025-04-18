@@ -1,7 +1,7 @@
 import axios from "axios";
 import { getWindDescription } from "./getWindDescription";
 import { WeatherResponse } from "@/interfaces/weatherResponse";
-import { getWeatherBackground } from "./getWeatherBackground";
+import { getWeatherBackground } from "./getBackground";
 import { formatIconForImage } from "./formatIconForImage";
 const apiKey = process.env.EXPO_PUBLIC_WEATHER_API_KEY;
 

@@ -1,16 +1,23 @@
 import { useCallback, useEffect, useState } from "react";
-import { SafeAreaView, Text, TouchableOpacity, View, ScrollView, RefreshControl, StatusBar, ActivityIndicator } from "react-native";
+import { ScrollView, RefreshControl, StatusBar, ActivityIndicator } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import SearchWeatherField from "./ui/SearchWeatherField";
 import Divider from "./ui/Divider";
-import NoLocationEnabled from "./ui/NoLocationEnabled";
+import LocationDisabled from "./ui/LocationDisabled";
 import { getWeather } from "@/utils/getWeather";
 import { ExtendedWeatherResponse } from "@/store/weatherSlice";
 import { getAutomaticlyCity } from "@/utils/getAutomaticlyCity";
-import PropositionToRegister from "./ui/PropositionToRegister";
 import LocationEnabled from "./ui/LocationEnabled";
+import { validateToken } from "@/utils/validateToken";
+import { auth } from "@/lib/firebase";
+import { User } from "firebase/auth";
+import PropositionToAuth from "./ui/PropositionToAuth";
+import PropositionToVerifyEmail from "./ui/PropositionToVerify";
+import SavedForecasts from "./ui/SavedForecasts";
 
 export default function MainScreen() {
   const [city, setCity] = useState("");
+  const [user, setUser] = useState<User | null>(null);
   const [greeting, setGreeting] = useState("Hello");
   const [loadingLocation, setLoadingLocation] = useState(true);
   const [weatherLocal, setWeatherLocal] = useState<ExtendedWeatherResponse>();
@@ -37,14 +44,35 @@ export default function MainScreen() {
 
   useEffect(() => {
     getLocaleWeather();
+    validateToken();
+    const unsubscribe = auth.onAuthStateChanged((currentUser) => {
+      setUser(currentUser);
+      if (currentUser) {
+        currentUser.reload().then(() => {
+          setUser(auth.currentUser);
+        });
+      }
+    });
+    return () => unsubscribe();
   }, []);
 
   const onRefresh = useCallback(() => {
     getLocaleWeather();
-  }, [city]);
+    validateToken();
+    if (auth.currentUser) {
+      auth.currentUser
+        .reload()
+        .then(() => {
+          setUser(auth.currentUser);
+        })
+        .catch((error) => {
+          console.error("Error refreshing user:", error);
+        });
+    }
+  }, []);
 
   return (
-    <SafeAreaView className="flex-1" style={{ backgroundColor: weatherLocal?.background || "#A9A9A9" }}>
+    <SafeAreaView className="flex-1" style={{ backgroundColor: weatherLocal?.background || "#A9A9A9" }} edges={["top", "left", "right"]}>
       <ScrollView
         contentContainerStyle={{ flexGrow: 1 }}
         refreshControl={<RefreshControl refreshing={loadingLocation} onRefresh={onRefresh} />}
@@ -54,7 +82,7 @@ export default function MainScreen() {
           city ? (
             <LocationEnabled greeting={greeting} city={city} weatherLocal={weatherLocal!} />
           ) : (
-            <NoLocationEnabled />
+            <LocationDisabled />
           )
         ) : (
           <ActivityIndicator size="small" color="white" />
@@ -64,7 +92,7 @@ export default function MainScreen() {
 
         <SearchWeatherField />
 
-        <PropositionToRegister />
+        {!user ? <PropositionToAuth /> : <>{!user.emailVerified ? <PropositionToVerifyEmail onRefresh={onRefresh} /> : <SavedForecasts />}</>}
         <StatusBar />
       </ScrollView>
     </SafeAreaView>

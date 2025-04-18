@@ -11,8 +11,10 @@ export default function Forecast5Days() {
 
   useEffect(() => {
     const getData = async () => {
-      const result = await getForecast5Days("Lviv");
-      setWeather(result);
+      if (city) {
+        const result = await getForecast5Days(city);
+        setWeather(result);
+      }
     };
     getData();
   }, [city]);

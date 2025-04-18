@@ -1,4 +1,4 @@
-import { View, Text, Image } from "react-native";
+import { View, Text } from "react-native";
 import { BlurView } from "expo-blur";
 import React from "react";
 import { useSelector } from "react-redux";

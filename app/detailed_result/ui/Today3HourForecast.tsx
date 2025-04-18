@@ -6,7 +6,7 @@ import { formatIconForImage } from "@/utils/formatIconForImage";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 
-interface Today3HourForecast {
+interface IToday3HourForecast {
   temp: number;
   date: string;
   icon: string;
@@ -14,7 +14,7 @@ interface Today3HourForecast {
 
 export default function Today3HourForecast() {
   const city = useSelector((state: RootState) => state.weather.data?.city);
-  const [weather, setWeather] = useState<Today3HourForecast[]>([]);
+  const [weather, setWeather] = useState<IToday3HourForecast[]>([]);
   
   useEffect(() => {
     const getData = async () => {
@@ -36,7 +36,7 @@ export default function Today3HourForecast() {
       <View className="space-y-3 p-5">
         <Text className="text-xl font-light text-white">Forecast for today</Text>
         <View className="flex-row justify-between">
-          {weather.map((el: Today3HourForecast, index) => {
+          {weather.map((el: IToday3HourForecast, index) => {
             return (
               <View key={index} className="flex items-center">
                 <Text className="text-lg text-white">{el.date}</Text>

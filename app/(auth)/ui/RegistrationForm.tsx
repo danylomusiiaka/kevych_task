@@ -4,23 +4,34 @@ import { useState } from "react";
 import { ActivityIndicator, Text, TextInput, TouchableOpacity, View } from "react-native";
 
 type RegistrationFormProps = {
-  onSubmit: (email: string, password: string, confirmPassword: string) => void;
+  onSubmit: (name: string, email: string, password: string, confirmPassword: string) => void;
   loading: boolean;
 };
 
 export default function RegisterForm({ onSubmit, loading }: RegistrationFormProps) {
-  const [registrationForm, setRegistrationForm] = useState({ email: "", password: "", confirmPassword: "" });
+  const [registrationForm, setRegistrationForm] = useState({ name: "", email: "", password: "", confirmPassword: "" });
   const router = useRouter();
 
   const handleSubmit = () => {
-    const { email, password, confirmPassword } = registrationForm;
-    onSubmit(email, password, confirmPassword);
+    const { name, email, password, confirmPassword } = registrationForm;
+    onSubmit(name, email, password, confirmPassword);
   };
 
   return (
     <View className="flex h-full justify-center space-y-4 p-4">
       <Text className="text-xl font-bold text-gray-800">Registration</Text>
 
+      <View className="space-y-2">
+        <Text>Your name</Text>
+        <TextInput
+          className="border-1 border p-3 text-black"
+          value={registrationForm.name}
+          onChangeText={(value) => setRegistrationForm({ ...registrationForm, name: value })}
+          keyboardType="default"
+          placeholder="Danylo"
+          placeholderTextColor="gray"
+        />
+      </View>
       <View className="space-y-2">
         <Text>Email</Text>
         <TextInput

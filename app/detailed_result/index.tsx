@@ -1,4 +1,4 @@
-import { View, SafeAreaView, ScrollView, Animated } from "react-native";
+import { View, ScrollView, Animated } from "react-native";
 import React, { ReactElement, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
@@ -6,8 +6,9 @@ import MainBlock from "./ui/MainBlock";
 import WindBlock from "./ui/WindBlock";
 import Today3HourForecast from "./ui/Today3HourForecast";
 import Forecast5Days from "./ui/Forecast5Days";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-const AnimatedBlock = ({ children, delay, index }: {children: ReactElement, delay: number, index: number }) => {
+const AnimatedBlock = ({ children, delay, index }: { children: ReactElement; delay: number; index: number }) => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(20)).current;
 
@@ -27,7 +28,7 @@ const AnimatedBlock = ({ children, delay, index }: {children: ReactElement, dela
         }),
       ]),
     ]).start();
-  }, []);
+  });
 
   return (
     <Animated.View
@@ -43,10 +44,10 @@ const AnimatedBlock = ({ children, delay, index }: {children: ReactElement, dela
 
 export default function DetailedResult() {
   const weather = useSelector((state: RootState) => state.weather.data);
-  const DELAY_AMOUNT = 300; 
+  const DELAY_AMOUNT = 300;
 
   return (
-    <SafeAreaView className="flex-1" style={{ backgroundColor: weather?.background }}>
+    <SafeAreaView className="flex-1" style={{ backgroundColor: weather?.background }} edges={["top", "left", "right"]}>
       <ScrollView showsVerticalScrollIndicator={false}>
         <View className="m-5">
           <AnimatedBlock index={0} delay={DELAY_AMOUNT}>

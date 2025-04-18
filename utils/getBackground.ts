@@ -31,5 +31,5 @@ const weatherBackgroundColors: { [key: string]: string } = {
 };
 
 export const getWeatherBackground = (description: string) => {
-  return weatherBackgroundColors[description] || "#D3D3D3";
+  return weatherBackgroundColors[description] || "#A9A9A9";
 };
