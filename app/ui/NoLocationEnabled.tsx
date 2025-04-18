@@ -3,8 +3,8 @@ import React from "react";
 
 export default function NoLocationEnabled() {
   return (
-    <View className="space-y-3">
-      <Text className="text-3xl font-extralight text-gray-800">Welcome to Weather App!</Text>
+    <View className="mb-4 space-y-3">
+      <Text className="text-3xl font-extralight text-white">Welcome to Weather App!</Text>
       <View className="space-y-3">
         <Text className="text-red-400">
           * Your location settings are disabled. To automatically get the weather forecast for your city – please,

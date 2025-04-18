@@ -1,7 +1,11 @@
 import { WeatherResponse } from "@/interfaces/weatherResponse";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-const initialState: { data: WeatherResponse | null } = {
+export interface ExtendedWeatherResponse extends WeatherResponse {
+  city: string;
+}
+
+const initialState: { data: ExtendedWeatherResponse | null } = {
   data: null,
 };
 
@@ -9,7 +13,7 @@ export const weatherSlice = createSlice({
   name: "weather",
   initialState,
   reducers: {
-    setWeather: (state, action: PayloadAction<WeatherResponse>) => {
+    setWeather: (state, action: PayloadAction<ExtendedWeatherResponse>) => {
       state.data = action.payload;
     },
     clearWeather: (state) => {

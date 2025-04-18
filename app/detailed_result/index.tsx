@@ -1,29 +1,71 @@
-import { View, Text, SafeAreaView } from "react-native";
-import React from "react";
+import { View, SafeAreaView, ScrollView, Animated } from "react-native";
+import React, { ReactElement, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
-import { BlurView } from "expo-blur";
 import MainBlock from "./ui/MainBlock";
+import WindBlock from "./ui/WindBlock";
+import Today3HourForecast from "./ui/Today3HourForecast";
+import Forecast5Days from "./ui/Forecast5Days";
+
+const AnimatedBlock = ({ children, delay, index }: {children: ReactElement, delay: number, index: number }) => {
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const translateY = useRef(new Animated.Value(20)).current;
+
+  useEffect(() => {
+    Animated.sequence([
+      Animated.delay(delay * index),
+      Animated.parallel([
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+        Animated.timing(translateY, {
+          toValue: 0,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+      ]),
+    ]).start();
+  }, []);
+
+  return (
+    <Animated.View
+      style={{
+        opacity: fadeAnim,
+        transform: [{ translateY }],
+      }}
+    >
+      {children}
+    </Animated.View>
+  );
+};
 
 export default function DetailedResult() {
   const weather = useSelector((state: RootState) => state.weather.data);
+  const DELAY_AMOUNT = 300; 
 
   return (
     <SafeAreaView className="flex-1" style={{ backgroundColor: weather?.background }}>
-      <View className="m-5 space-y-5">
-        <MainBlock />
-        <BlurView intensity={100} tint="light" style={{ borderRadius: 16, overflow: "hidden" }}>
-          <View className="flex items-center justify-center space-y-4 p-5">
-            <Text className="text-xl font-light text-white">Львів</Text>
-            <Text className="ml-4 text-7xl font-light text-white">{weather?.temp.toFixed(0)}°</Text>
-            <View className="flex-row space-x-4">
-              <Text className="text-xl font-light text-white">{weather?.description}</Text>
-              <View className="border border-b" style={{ borderColor: weather?.background }}></View>
-              <Text className="text-xl font-light text-white">Feels like {weather?.feels_like.toFixed(0)}°</Text>
-            </View>
-          </View>
-        </BlurView>
-      </View>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <View className="m-5">
+          <AnimatedBlock index={0} delay={DELAY_AMOUNT}>
+            <MainBlock />
+          </AnimatedBlock>
+
+          <AnimatedBlock index={1} delay={DELAY_AMOUNT}>
+            <Today3HourForecast />
+          </AnimatedBlock>
+
+          <AnimatedBlock index={2} delay={DELAY_AMOUNT}>
+            <Forecast5Days />
+          </AnimatedBlock>
+
+          <AnimatedBlock index={3} delay={DELAY_AMOUNT}>
+            <WindBlock />
+          </AnimatedBlock>
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }

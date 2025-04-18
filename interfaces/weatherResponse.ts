@@ -7,6 +7,8 @@ export interface WeatherResponse {
   humidity: number;
   wind_speed: number;
   wind_description: string;
+  wind_deg: number;
   feel: string;
   background: string;
+  visibility: number;
 }
